@@ -13,7 +13,7 @@ namespace com.GamesForMobileDevices
             {
                 if (hit.collider.TryGetComponent(out IInteractable interactable))
                 {
-                    interactable.ProcessTap();
+                    interactable?.ProcessTap();
                 }
             }
         }

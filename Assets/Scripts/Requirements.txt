@@ -1,0 +1,8 @@
+﻿Drag can select object
+Drag moves selected object
+if not, drag moves camera
+2 finger drag
+rotate phone will move camera
+rotate forward/back will move camera forward/back
+rotate left/right will rotate camera left/right
+simple gui buttons
