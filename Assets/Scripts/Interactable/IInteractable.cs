@@ -3,5 +3,7 @@
     public interface IInteractable
     {
         void ProcessTap();
+        void EnableOutline();
+        void DisableOutline();
     }
 }

@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace com.GamesForMobileDevices.Interactable
 {
-    public class CapsuleScript : MonoBehaviour, IInteractable
+    public class CapsuleScript : InteractableAbstract
     {
-        public void ProcessTap()
+        public override void ProcessTap()
         {
             GetComponent<Renderer>().material.color = Color.red;
         }

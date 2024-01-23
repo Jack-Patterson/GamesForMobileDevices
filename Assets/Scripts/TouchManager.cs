@@ -24,7 +24,7 @@ namespace com.GamesForMobileDevices
         {
             CheckTouch();
             AssignTouchHandler();
-            
+
             // print(selectedObject);
         }
 
@@ -47,40 +47,61 @@ namespace com.GamesForMobileDevices
                 Touch touch = currentTouches[0];
                 Vector3 touchPosition = touch.position;
                 float distance = Vector3.Distance(touchPosition, _mainCamera.transform.position);
-                
+
                 switch (touch.phase)
                 {
                     case TouchPhase.Began:
                         _touchTimer = 0f;
                         _hasMoved = false;
-                        
+
                         Ray ray = _mainCamera.ScreenPointToRay(touch.position);
                         if (Physics.Raycast(ray, out RaycastHit hit))
                         {
                             if (hit.collider.GetComponent<IInteractable>() != null)
                             {
                                 _selectedObject = hit.collider.gameObject;
+                                _selectedObject.GetComponent<IInteractable>().EnableOutline();
+                                print("Distance: " + Vector3.Distance(_mainCamera.transform.position,
+                                    _selectedObject.transform.position));
                             }
                         }
-                        
+
                         break;
                     case TouchPhase.Stationary:
                         _touchTimer += Time.deltaTime;
                         break;
                     case TouchPhase.Moved:
                         _hasMoved = true;
-                        
+
                         if (_selectedObject != null)
                         {
-                            Vector3 selectedObjectPosition = _selectedObject.transform.position;
-
-                            Vector3 pos = _mainCamera.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, distance));
-                            _selectedObject.transform.position = new Vector3(pos.x, pos.y, selectedObjectPosition.z);
+                            Vector3 touchPos = new Vector3(touch.position.x, touch.position.y, 0);
+                            Ray rayC = _mainCamera.ScreenPointToRay(touchPos);
+                            
+                            float orbitDistance = Vector3.Distance(_mainCamera.transform.position, _selectedObject.transform.position);
+                            Vector3 newPosition = _mainCamera.transform.position + rayC.direction * orbitDistance;
+                            _selectedObject.transform.position = newPosition;
+                            
                         }
+                        else
+                        {
+                            float rotateX = -touch.deltaPosition.y * 5f * Time.deltaTime;
+                            float rotateY = touch.deltaPosition.x * 5f * Time.deltaTime;
+                            
+                            Quaternion currentRotation = transform.rotation;
+                            Quaternion newRotation = Quaternion.Euler(
+                                currentRotation.eulerAngles.x + rotateX,
+                                currentRotation.eulerAngles.y + rotateY,
+                                0
+                            );
+                            transform.rotation = newRotation;
+                        }
+
                         break;
                     case TouchPhase.Ended:
+                        _selectedObject?.GetComponent<IInteractable>()?.DisableOutline();
                         _actOn.TapAt(touch.position);
-                        
+
                         if (_touchTimer <= MaxTimeForSwipe && !_hasMoved)
                         {
                             print($"Tap at {touch.position}");
@@ -93,7 +114,7 @@ namespace com.GamesForMobileDevices
                         {
                             print($"Hold at {touch.position}");
                         }
-                        
+
                         _selectedObject = null;
 
                         break;

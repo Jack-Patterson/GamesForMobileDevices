@@ -2,9 +2,9 @@
 
 namespace com.GamesForMobileDevices.Interactable
 {
-    public class CubeScript : MonoBehaviour, IInteractable
+    public class CubeScript : InteractableAbstract
     {
-        public void ProcessTap()
+        public override void ProcessTap()
         {
             GetComponent<Renderer>().material.color = Color.green;
         }

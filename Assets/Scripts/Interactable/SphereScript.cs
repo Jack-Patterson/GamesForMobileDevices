@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace com.GamesForMobileDevices.Interactable
 {
-    public class SphereScript : MonoBehaviour, IInteractable
+    public class SphereScript : InteractableAbstract
     {
-        public void ProcessTap()
+        public override void ProcessTap()
         {
             GetComponent<Renderer>().material.color = Color.yellow;
         }
