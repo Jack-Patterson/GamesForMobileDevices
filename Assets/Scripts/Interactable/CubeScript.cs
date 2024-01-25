@@ -8,5 +8,10 @@ namespace com.GamesForMobileDevices.Interactable
         {
             GetComponent<Renderer>().material.color = Color.green;
         }
+
+        public override void ProcessDrag(Vector3 newPosition)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

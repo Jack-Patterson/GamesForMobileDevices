@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using com.GamesForMobileDevices.Interactable;
+﻿using com.GamesForMobileDevices.Interactable;
 using UnityEngine;
 
 namespace com.GamesForMobileDevices
@@ -8,11 +6,13 @@ namespace com.GamesForMobileDevices
     public class TouchHandler : MonoBehaviour
     {
         private const float MaxTimeForTap = 0.5f;
+        private const float CameraRotateSpeed = 5f;
         private Camera MainCamera => Camera.main;
-        private float _touchTimer = 0;
-        private bool _hasMoved = false;
+        private float _touchTimer;
+        private bool _hasMoved;
         GestureAction _actOn;
-        private GameObject _selectedObject;
+        private IInteractable _interactable;
+        private float _distance;
 
         private void Start()
         {
@@ -21,21 +21,21 @@ namespace com.GamesForMobileDevices
 
         internal void CheckTouch(Touch touch)
         {
-            Vector3 touchPosition = touch.position;
-
+            Vector2 touchPosition = touch.position;
+            Vector2 touchDeltaPosition = touch.deltaPosition;
+            Vector3 cameraPosition = MainCamera.transform.position;
+            
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-
-                    Ray ray = MainCamera.ScreenPointToRay(touch.position);
-                    if (Physics.Raycast(ray, out RaycastHit hit))
+                    Ray touchPositionToRay = MainCamera.ScreenPointToRay(touchPosition);
+                    if (Physics.Raycast(touchPositionToRay, out RaycastHit hit))
                     {
-                        if (hit.collider.GetComponent<IInteractable>() != null)
+                        if (hit.collider.TryGetComponent(out _interactable))
                         {
-                            _selectedObject = hit.collider.gameObject;
-                            _selectedObject.GetComponent<IInteractable>().EnableOutline();
-                            print("Distance: " + Vector3.Distance(MainCamera.transform.position,
-                                _selectedObject.transform.position));
+                            _interactable.EnableOutline();
+                            _distance = Vector3.Distance(cameraPosition, _interactable.Position);
+                            print("Distance: " + _distance);
                         }
                     }
 
@@ -46,49 +46,41 @@ namespace com.GamesForMobileDevices
                 case TouchPhase.Moved:
                     _hasMoved = true;
 
-                    if (_selectedObject != null)
+                    if (_interactable != null)
                     {
-                        Vector3 touchPos = new Vector3(touch.position.x, touch.position.y, 0);
-                        Ray rayC = MainCamera.ScreenPointToRay(touchPos);
-
-                        float orbitDistance = Vector3.Distance(MainCamera.transform.position,
-                            _selectedObject.transform.position);
-                        Vector3 newPosition = MainCamera.transform.position + rayC.direction * orbitDistance;
-                        _selectedObject.transform.position = newPosition;
+                        _actOn.DragAt(_interactable, touchPosition, _distance);
                     }
                     else
                     {
-                        float rotateX = -touch.deltaPosition.y * 5f * Time.deltaTime;
-                        float rotateY = touch.deltaPosition.x * 5f * Time.deltaTime;
+                        float rotateX = -touchDeltaPosition.y * CameraRotateSpeed * Time.deltaTime;
+                        float rotateY = touchDeltaPosition.x * CameraRotateSpeed * Time.deltaTime;
 
                         Quaternion currentRotation = transform.rotation;
                         Quaternion newRotation = Quaternion.Euler(
                             currentRotation.eulerAngles.x + rotateX,
                             currentRotation.eulerAngles.y + rotateY,
-                            0
+                            0f
                         );
                         MainCamera.transform.rotation = newRotation;
                     }
 
                     break;
                 case TouchPhase.Ended:
-                    _selectedObject?.GetComponent<IInteractable>()?.DisableOutline();
-                    _actOn.TapAt(touch.position);
+                    _interactable?.DisableOutline();
 
                     if (_touchTimer <= MaxTimeForTap && !_hasMoved)
                     {
-                        print($"Tap at {touch.position}");
+                        print($"Tap at {touchPosition}");
+                        _actOn.TapAt(touchPosition);
                     }
                     else if (_hasMoved)
                     {
-                        print($"Swipe at {touch.position}");
+                        print($"Swipe at {touchPosition}");
                     }
                     else
                     {
-                        print($"Hold at {touch.position}");
+                        print($"Hold at {touchPosition}");
                     }
-
-                    _selectedObject = null;
 
                     break;
             }
@@ -98,7 +90,7 @@ namespace com.GamesForMobileDevices
         {
             _touchTimer = 0;
             _hasMoved = false;
-            _selectedObject = null;
+            _interactable = null;
         }
     }
 }

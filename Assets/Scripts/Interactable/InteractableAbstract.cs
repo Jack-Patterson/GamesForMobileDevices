@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace com.GamesForMobileDevices.Interactable
 {
@@ -9,8 +8,14 @@ namespace com.GamesForMobileDevices.Interactable
         private Material _originalMaterial;
 
         [SerializeField] private DragType dragType = DragType.Orbit;
-        
+
         public DragType DragType => dragType;
+
+        public Vector3 Position
+        {
+            get => transform.position;
+            set => transform.position = value;
+        }
 
         private void Start()
         {
@@ -19,13 +24,14 @@ namespace com.GamesForMobileDevices.Interactable
         }
 
         public abstract void ProcessTap();
+        public abstract void ProcessDrag(Vector3 newPosition);
 
         public void EnableOutline()
         {
             Material outlineMaterial = new Material(Shader.Find("Standard"));
             Color outlineColor = Color.blue;
             outlineColor.a = .5f;
-            
+
             outlineMaterial.color = outlineColor;
             outlineMaterial.SetFloat("_Outline", .5f);
             _renderer.material = outlineMaterial;

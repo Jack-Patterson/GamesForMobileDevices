@@ -7,9 +7,10 @@ namespace com.GamesForMobileDevices
 {
     public class TouchManager : MonoBehaviour
     {
+        private static readonly Touch NullTouch = new Touch { phase = TouchPhase.Canceled };
         [SerializeField] private int maxTouches = 5;
-        private List<TouchHandler> _touchHandlers;
-        private List<Touch> _activeTouches;
+        private List<TouchHandler> _touchHandlers = new();
+        private List<Touch> _activeTouches = new();
 
         private void Start()
         {
@@ -34,10 +35,10 @@ namespace com.GamesForMobileDevices
                 TouchHandler touchHandler = touchHandlerObject.AddComponent<TouchHandler>();
                 _touchHandlers.Add(touchHandler);
                 
-                _activeTouches.Add(default);
+                _activeTouches.Add(NullTouch);
             }
         }
-    
+
         private void AssignTouches()
         {
             for (int i = 0; i < maxTouches; i++)
@@ -48,8 +49,9 @@ namespace com.GamesForMobileDevices
                 }
                 else
                 {
-                    _activeTouches[i] = default;
+                    _activeTouches[i] = NullTouch;
                 }
+
             }
         }
 
