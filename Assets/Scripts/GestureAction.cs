@@ -19,7 +19,7 @@ namespace com.GamesForMobileDevices
                 }
             }
         }
-
+        
         internal void DragAt(IInteractable interactable, Vector2 touchPosition, float distance)
         {
             Vector3 newPosition = MainCamera.ScreenPointToRay(touchPosition).GetPoint(distance);

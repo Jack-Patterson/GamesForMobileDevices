@@ -1,30 +1,66 @@
-﻿using com.GamesForMobileDevices.Interactable;
+﻿using System;
+using com.GamesForMobileDevices.Interactable;
 using UnityEngine;
 
 namespace com.GamesForMobileDevices
 {
     public class TouchHandler : MonoBehaviour
     {
+        private static Camera MainCamera => Camera.main;
+        internal int touchId = -1;
+        internal bool HasMultiTouchPartner => _multiTouchPartner != null;
         private const float MaxTimeForTap = 0.5f;
         private const float CameraRotateSpeed = 5f;
-        private Camera MainCamera => Camera.main;
         private float _touchTimer;
         private bool _hasMoved;
-        GestureAction _actOn;
+        private GestureAction _actOn;
         private IInteractable _interactable;
         private float _distance;
+        private TouchHandler _multiTouchPartner;
 
-        private void Start()
+        private void Update()
         {
-            _actOn = FindObjectOfType<GestureAction>();
+            if (touchId == -1) return;
+
+            CheckTouch();
         }
 
-        internal void CheckTouch(Touch touch)
+        internal void Initialize(int touchIndex, GestureAction actOn)
         {
+            touchId = touchIndex;
+            _actOn = actOn;
+            
+            CheckTouch();
+        }
+
+        internal void Reset()
+        {
+            touchId = -1;
+            _touchTimer = 0;
+            _hasMoved = false;
+            _interactable = null;
+        }
+
+        internal void SetMultiTouchPartner(TouchHandler touchHandler)
+        {
+            _multiTouchPartner = touchHandler;
+        }
+
+        internal void RemoveMultiTouchPartner()
+        {
+            _multiTouchPartner = null;
+        }
+
+        private void CheckTouch()
+        {
+            print(touchId);
+
+            Touch touch = Input.GetTouch(touchId);
+            
             Vector2 touchPosition = touch.position;
             Vector2 touchDeltaPosition = touch.deltaPosition;
             Vector3 cameraPosition = MainCamera.transform.position;
-            
+
             switch (touch.phase)
             {
                 case TouchPhase.Began:
@@ -37,6 +73,11 @@ namespace com.GamesForMobileDevices
                             _distance = Vector3.Distance(cameraPosition, _interactable.Position);
                             print("Distance: " + _distance);
                         }
+                    }
+
+                    if (_interactable == null)
+                    {
+                        TouchManager.instance.RegisterMultiTouchCapableTouchHandler(this);
                     }
 
                     break;
@@ -52,21 +93,33 @@ namespace com.GamesForMobileDevices
                     }
                     else
                     {
-                        float rotateX = -touchDeltaPosition.y * CameraRotateSpeed * Time.deltaTime;
-                        float rotateY = touchDeltaPosition.x * CameraRotateSpeed * Time.deltaTime;
-
-                        Quaternion currentRotation = transform.rotation;
-                        Quaternion newRotation = Quaternion.Euler(
-                            currentRotation.eulerAngles.x + rotateX,
-                            currentRotation.eulerAngles.y + rotateY,
-                            0f
-                        );
-                        MainCamera.transform.rotation = newRotation;
+                        if (HasMultiTouchPartner)
+                        {
+                            // print("MultiTouchPartner");
+                        }
+                        else
+                        {
+                            float rotateX = -touchDeltaPosition.y * CameraRotateSpeed * Time.deltaTime;
+                            float rotateY = touchDeltaPosition.x * CameraRotateSpeed * Time.deltaTime;
+                            
+                            Quaternion currentRotation = MainCamera.transform.rotation;
+                            Quaternion newRotation = Quaternion.Euler(
+                                currentRotation.eulerAngles.x + rotateX,
+                                currentRotation.eulerAngles.y + rotateY,
+                                0f
+                            );
+                            MainCamera.transform.rotation = newRotation;
+                        }
                     }
 
                     break;
                 case TouchPhase.Ended:
+                    print("ended");
+                    
                     _interactable?.DisableOutline();
+                    TouchManager.instance.DeregisterMultiTouchCapableTouchHandler(this);
+                    RemoveMultiTouchPartner();
+                    _multiTouchPartner?.RemoveMultiTouchPartner();
 
                     if (_touchTimer <= MaxTimeForTap && !_hasMoved)
                     {
@@ -81,16 +134,12 @@ namespace com.GamesForMobileDevices
                     {
                         print($"Hold at {touchPosition}");
                     }
+                    
+                    touchId = -1;
+                    TouchManager.instance.RemoveTouchHandler(this);
 
                     break;
             }
-        }
-
-        internal void Reset()
-        {
-            _touchTimer = 0;
-            _hasMoved = false;
-            _interactable = null;
         }
     }
 }

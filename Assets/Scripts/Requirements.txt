@@ -6,3 +6,7 @@ rotate phone will move camera
 rotate forward/back will move camera forward/back
 rotate left/right will rotate camera left/right
 simple gui buttons
+
+2 finger
+starting distance
+starting angle

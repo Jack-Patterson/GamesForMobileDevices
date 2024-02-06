@@ -7,68 +7,77 @@ namespace com.GamesForMobileDevices
 {
     public class TouchManager : MonoBehaviour
     {
-        private static readonly Touch NullTouch = new Touch { phase = TouchPhase.Canceled };
+        internal static TouchManager instance = null!;
+        private readonly List<TouchHandler> _multiTouchCapableTouchHandlers = new();
         [SerializeField] private int maxTouches = 5;
         private List<TouchHandler> _touchHandlers = new();
-        private List<Touch> _activeTouches = new();
+        private GestureAction _actOn = null!;
+
+        private void Awake()
+        {
+            instance = this;
+        }
 
         private void Start()
         {
-            InitializeTouchHandlers();
+            _actOn = FindObjectOfType<GestureAction>();
+            
+            print(Input.touchCount);
+            print(Input.touches);
         }
 
         private void Update()
         {
             AssignTouches();
-            CheckTouches();
         }
 
-        private void InitializeTouchHandlers()
+        internal void RemoveTouchHandler(TouchHandler touchHandler)
         {
-            _touchHandlers = new List<TouchHandler>(maxTouches);
-            _activeTouches = new List<Touch>(maxTouches);
+            _touchHandlers.Remove(touchHandler);
+            Destroy(touchHandler.gameObject);
+        }
 
-            for (int i = 0; i < maxTouches; i++)
-            {
-                GameObject touchHandlerObject = new GameObject("TouchHandler_" + i);
-                touchHandlerObject.transform.parent = transform;
-                TouchHandler touchHandler = touchHandlerObject.AddComponent<TouchHandler>();
-                _touchHandlers.Add(touchHandler);
-                
-                _activeTouches.Add(NullTouch);
-            }
+        internal void RegisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
+        {
+            _multiTouchCapableTouchHandlers.Add(touchHandler);
+        }
+        
+        internal void DeregisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
+        {
+            _multiTouchCapableTouchHandlers.Remove(touchHandler);
+        }
+        
+        private TouchHandler CreateTouchHandler(int touchIndex)
+        {
+            GameObject touchHandlerObject = new GameObject("TouchHandler_" + touchIndex);
+            touchHandlerObject.transform.parent = transform;
+            TouchHandler touchHandler = touchHandlerObject.AddComponent<TouchHandler>();
+            touchHandler.Initialize(touchIndex, _actOn);
+            _touchHandlers.Add(touchHandler);
+
+            return touchHandler;
         }
 
         private void AssignTouches()
         {
-            for (int i = 0; i < maxTouches; i++)
+            for (int i = 0; i < Input.touches.Length; i++)
             {
-                if (i < Input.touchCount)
+                if (_touchHandlers.Count < Input.touches.Length)
                 {
-                    _activeTouches[i] = Input.GetTouch(i);
+                    CreateTouchHandler(i);
                 }
-                else
-                {
-                    _activeTouches[i] = NullTouch;
-                }
-
             }
-        }
-
-        private void CheckTouches()
-        {
-            for (int i = 0; i < maxTouches; i++)
-            {
-                _touchHandlers[i].CheckTouch(_activeTouches[i]);
-
-                if (_activeTouches[i].phase != TouchPhase.Ended) continue;
-                _activeTouches[i] = default;
-
-                TouchHandler touchHandler = _touchHandlers[i];
-                _touchHandlers.Remove(touchHandler);
-                _touchHandlers.Add(touchHandler);
-                touchHandler.Reset();
-            }
+            
+            if (_multiTouchCapableTouchHandlers.Count < 2) return;
+            
+            TouchHandler touchHandler1 = _multiTouchCapableTouchHandlers[0];
+            TouchHandler touchHandler2 = _multiTouchCapableTouchHandlers[1];
+            
+            if (touchHandler1.touchId == -1 || touchHandler2.touchId == -1) return;
+            if (touchHandler1.HasMultiTouchPartner || touchHandler2.HasMultiTouchPartner) return;
+            
+            touchHandler1.SetMultiTouchPartner(touchHandler2);
+            touchHandler2.SetMultiTouchPartner(touchHandler1);
         }
     }
 }
