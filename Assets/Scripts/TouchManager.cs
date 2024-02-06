@@ -7,11 +7,12 @@ namespace com.GamesForMobileDevices
 {
     public class TouchManager : MonoBehaviour
     {
-        internal static TouchManager instance = null!;
-        private readonly List<TouchHandler> _multiTouchCapableTouchHandlers = new();
         [SerializeField] private int maxTouches = 5;
-        private List<TouchHandler> _touchHandlers = new();
+        
+        internal static TouchManager instance = null!;
         private GestureAction _actOn = null!;
+        private readonly List<TouchHandler> _touchHandlers = new();
+        private readonly List<TouchHandler> _multiTouchCapableTouchHandlers = new();
 
         private void Awake()
         {
@@ -47,15 +48,13 @@ namespace com.GamesForMobileDevices
             _multiTouchCapableTouchHandlers.Remove(touchHandler);
         }
         
-        private TouchHandler CreateTouchHandler(int touchIndex)
+        private void CreateTouchHandler(int touchIndex)
         {
             GameObject touchHandlerObject = new GameObject("TouchHandler_" + touchIndex);
             touchHandlerObject.transform.parent = transform;
             TouchHandler touchHandler = touchHandlerObject.AddComponent<TouchHandler>();
             touchHandler.Initialize(touchIndex, _actOn);
             _touchHandlers.Add(touchHandler);
-
-            return touchHandler;
         }
 
         private void AssignTouches()
