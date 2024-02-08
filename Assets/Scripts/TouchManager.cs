@@ -7,8 +7,6 @@ namespace com.GamesForMobileDevices
 {
     public class TouchManager : MonoBehaviour
     {
-        [SerializeField] private int maxTouches = 5;
-        
         internal static TouchManager instance = null!;
         private GestureAction _actOn = null!;
         private readonly List<TouchHandler> _touchHandlers = new();
@@ -34,8 +32,16 @@ namespace com.GamesForMobileDevices
 
         internal void RemoveTouchHandler(TouchHandler touchHandler)
         {
-            _touchHandlers.Remove(touchHandler);
+            int handlerIndex = _touchHandlers.IndexOf(touchHandler);
+            _touchHandlers.RemoveAt(handlerIndex);
             Destroy(touchHandler.gameObject);
+
+            foreach (TouchHandler otherTouchHandler in _touchHandlers)
+            {
+                otherTouchHandler.previousTouchId = otherTouchHandler.touchId;
+                otherTouchHandler.touchId -= _touchHandlers.IndexOf(otherTouchHandler);
+                otherTouchHandler.gameObject.name = "TouchHandler_" + otherTouchHandler.touchId;
+            }
         }
 
         internal void RegisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
@@ -61,7 +67,7 @@ namespace com.GamesForMobileDevices
         {
             for (int i = 0; i < Input.touches.Length; i++)
             {
-                if (_touchHandlers.Count < Input.touches.Length)
+                if (!_touchHandlers.Exists(touchHandler => touchHandler.touchId == i))
                 {
                     CreateTouchHandler(i);
                 }

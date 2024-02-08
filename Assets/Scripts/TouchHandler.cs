@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using com.GamesForMobileDevices.Interactable;
 using UnityEngine;
 
@@ -17,10 +18,26 @@ namespace com.GamesForMobileDevices
         private IInteractable _interactable;
         private float _distance;
         private TouchHandler _multiTouchPartner;
+        internal int previousTouchId;
 
         private void Update()
         {
-            if (touchId == -1) return;
+            if (touchId != previousTouchId)
+            {
+                print("not same");
+            }
+
+            try
+            {
+                print(Input.GetTouch(touchId).phase);
+                print(Input.GetTouch(touchId).fingerId);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            if (touchId == -1 || !Input.touches.Any(touch => touch.fingerId == touchId)) return;
 
             CheckTouch();
         }
@@ -28,6 +45,7 @@ namespace com.GamesForMobileDevices
         internal void Initialize(int touchIndex, GestureAction actOn)
         {
             touchId = touchIndex;
+            previousTouchId = touchIndex;
             _actOn = actOn;
             
             CheckTouch();
@@ -54,6 +72,11 @@ namespace com.GamesForMobileDevices
         private void CheckTouch()
         {
             print(touchId);
+
+            if (touchId != previousTouchId)
+            {
+                print("not same");
+            }
 
             Touch touch = Input.GetTouch(touchId);
             
@@ -118,8 +141,8 @@ namespace com.GamesForMobileDevices
                     
                     _interactable?.DisableOutline();
                     TouchManager.instance.DeregisterMultiTouchCapableTouchHandler(this);
-                    RemoveMultiTouchPartner();
                     _multiTouchPartner?.RemoveMultiTouchPartner();
+                    RemoveMultiTouchPartner();
 
                     if (_touchTimer <= MaxTimeForTap && !_hasMoved)
                     {
@@ -135,7 +158,6 @@ namespace com.GamesForMobileDevices
                         print($"Hold at {touchPosition}");
                     }
                     
-                    touchId = -1;
                     TouchManager.instance.RemoveTouchHandler(this);
 
                     break;
