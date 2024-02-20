@@ -29,8 +29,9 @@ namespace com.GamesForMobileDevices
 
             try
             {
-                print(Input.GetTouch(touchId).phase);
-                print(Input.GetTouch(touchId).fingerId);
+                if (touchId == 1)
+                    print(Input.GetTouch(touchId).phase + $"{touchId}");
+                // print(Input.GetTouch(touchId).fingerId);
             }
             catch (Exception)
             {
@@ -47,7 +48,7 @@ namespace com.GamesForMobileDevices
             touchId = touchIndex;
             previousTouchId = touchIndex;
             _actOn = actOn;
-            
+
             CheckTouch();
         }
 
@@ -71,97 +72,105 @@ namespace com.GamesForMobileDevices
 
         private void CheckTouch()
         {
-            print(touchId);
+            // print(touchId);
 
             if (touchId != previousTouchId)
             {
                 print("not same");
             }
 
-            Touch touch = Input.GetTouch(touchId);
-            
-            Vector2 touchPosition = touch.position;
-            Vector2 touchDeltaPosition = touch.deltaPosition;
-            Vector3 cameraPosition = MainCamera.transform.position;
-
-            switch (touch.phase)
+            try
             {
-                case TouchPhase.Began:
-                    Ray touchPositionToRay = MainCamera.ScreenPointToRay(touchPosition);
-                    if (Physics.Raycast(touchPositionToRay, out RaycastHit hit))
-                    {
-                        if (hit.collider.TryGetComponent(out _interactable))
+                Touch touch = Input.GetTouch(touchId);
+
+
+                Vector2 touchPosition = touch.position;
+                Vector2 touchDeltaPosition = touch.deltaPosition;
+                Vector3 cameraPosition = MainCamera.transform.position;
+
+                switch (touch.phase)
+                {
+                    case TouchPhase.Began:
+                        Ray touchPositionToRay = MainCamera.ScreenPointToRay(touchPosition);
+                        if (Physics.Raycast(touchPositionToRay, out RaycastHit hit))
                         {
-                            _interactable.EnableOutline();
-                            _distance = Vector3.Distance(cameraPosition, _interactable.Position);
-                            print("Distance: " + _distance);
+                            if (hit.collider.TryGetComponent(out _interactable))
+                            {
+                                _interactable.EnableOutline();
+                                _distance = Vector3.Distance(cameraPosition, _interactable.Position);
+                                print("Distance: " + _distance);
+                            }
                         }
-                    }
 
-                    if (_interactable == null)
-                    {
-                        TouchManager.instance.RegisterMultiTouchCapableTouchHandler(this);
-                    }
-
-                    break;
-                case TouchPhase.Stationary:
-                    _touchTimer += Time.deltaTime;
-                    break;
-                case TouchPhase.Moved:
-                    _hasMoved = true;
-
-                    if (_interactable != null)
-                    {
-                        _actOn.DragAt(_interactable, touchPosition, _distance);
-                    }
-                    else
-                    {
-                        if (HasMultiTouchPartner)
+                        if (_interactable == null)
                         {
-                            // print("MultiTouchPartner");
+                            TouchManager.instance.RegisterMultiTouchCapableTouchHandler(this);
+                        }
+
+                        break;
+                    case TouchPhase.Stationary:
+                        _touchTimer += Time.deltaTime;
+                        break;
+                    case TouchPhase.Moved:
+                        _hasMoved = true;
+
+                        if (_interactable != null)
+                        {
+                            _actOn.DragAt(_interactable, touchPosition, _distance);
                         }
                         else
                         {
-                            float rotateX = -touchDeltaPosition.y * CameraRotateSpeed * Time.deltaTime;
-                            float rotateY = touchDeltaPosition.x * CameraRotateSpeed * Time.deltaTime;
-                            
-                            Quaternion currentRotation = MainCamera.transform.rotation;
-                            Quaternion newRotation = Quaternion.Euler(
-                                currentRotation.eulerAngles.x + rotateX,
-                                currentRotation.eulerAngles.y + rotateY,
-                                0f
-                            );
-                            MainCamera.transform.rotation = newRotation;
+                            if (HasMultiTouchPartner)
+                            {
+                                // print("MultiTouchPartner");
+                            }
+                            else
+                            {
+                                float rotateX = -touchDeltaPosition.y * CameraRotateSpeed * Time.deltaTime;
+                                float rotateY = touchDeltaPosition.x * CameraRotateSpeed * Time.deltaTime;
+
+                                Quaternion currentRotation = MainCamera.transform.rotation;
+                                Quaternion newRotation = Quaternion.Euler(
+                                    currentRotation.eulerAngles.x + rotateX,
+                                    currentRotation.eulerAngles.y + rotateY,
+                                    0f
+                                );
+                                MainCamera.transform.rotation = newRotation;
+                            }
                         }
-                    }
 
-                    break;
-                case TouchPhase.Ended:
-                    print("ended");
-                    
-                    _interactable?.DisableOutline();
-                    TouchManager.instance.DeregisterMultiTouchCapableTouchHandler(this);
-                    _multiTouchPartner?.RemoveMultiTouchPartner();
-                    RemoveMultiTouchPartner();
+                        break;
+                    case TouchPhase.Ended:
+                        // print("ended " + touchId);
 
-                    if (_touchTimer <= MaxTimeForTap && !_hasMoved)
-                    {
-                        print($"Tap at {touchPosition}");
-                        _actOn.TapAt(touchPosition);
-                    }
-                    else if (_hasMoved)
-                    {
-                        print($"Swipe at {touchPosition}");
-                    }
-                    else
-                    {
-                        print($"Hold at {touchPosition}");
-                    }
-                    
-                    TouchManager.instance.RemoveTouchHandler(this);
+                        _interactable?.DisableOutline();
+                        TouchManager.instance.DeregisterMultiTouchCapableTouchHandler(this);
+                        _multiTouchPartner?.RemoveMultiTouchPartner();
+                        RemoveMultiTouchPartner();
 
-                    break;
+                        if (_touchTimer <= MaxTimeForTap && !_hasMoved)
+                        {
+                            print($"Tap at {touchPosition}");
+                            _actOn.TapAt(touchPosition);
+                        }
+                        else if (_hasMoved)
+                        {
+                            print($"Swipe at {touchPosition}");
+                        }
+                        else
+                        {
+                            print($"Hold at {touchPosition}");
+                        }
+
+                        TouchManager.instance.RemoveTouchHandler(this);
+
+                        break;
+                }
             }
+            catch (Exception e)
+            {
+                // print(e);
+            }   
         }
     }
 }

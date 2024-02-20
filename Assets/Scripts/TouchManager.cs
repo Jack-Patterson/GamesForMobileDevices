@@ -43,7 +43,7 @@ namespace com.GamesForMobileDevices
                 otherTouchHandler.gameObject.name = "TouchHandler_" + otherTouchHandler.touchId;
             }
         }
-
+    
         internal void RegisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
         {
             _multiTouchCapableTouchHandlers.Add(touchHandler);
