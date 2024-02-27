@@ -72,105 +72,92 @@ namespace com.GamesForMobileDevices
 
         private void CheckTouch()
         {
-            // print(touchId);
+            Touch touch = Input.touches.First(t => t.fingerId == touchId);
 
-            if (touchId != previousTouchId)
+            Vector2 touchPosition = touch.position;
+            Vector2 touchDeltaPosition = touch.deltaPosition;
+            Vector3 cameraPosition = MainCamera.transform.position;
+
+            switch (touch.phase)
             {
-                print("not same");
-            }
-
-            try
-            {
-                Touch touch = Input.GetTouch(touchId);
-
-
-                Vector2 touchPosition = touch.position;
-                Vector2 touchDeltaPosition = touch.deltaPosition;
-                Vector3 cameraPosition = MainCamera.transform.position;
-
-                switch (touch.phase)
-                {
-                    case TouchPhase.Began:
-                        Ray touchPositionToRay = MainCamera.ScreenPointToRay(touchPosition);
-                        if (Physics.Raycast(touchPositionToRay, out RaycastHit hit))
+                case TouchPhase.Began:
+                    Ray touchPositionToRay = MainCamera.ScreenPointToRay(touchPosition);
+                    if (Physics.Raycast(touchPositionToRay, out RaycastHit hit))
+                    {
+                        if (hit.collider.TryGetComponent(out _interactable))
                         {
-                            if (hit.collider.TryGetComponent(out _interactable))
-                            {
-                                _interactable.EnableOutline();
-                                _distance = Vector3.Distance(cameraPosition, _interactable.Position);
-                                print("Distance: " + _distance);
-                            }
+                            _interactable.EnableOutline();
+                            _distance = Vector3.Distance(cameraPosition, _interactable.Position);
+                            print("Distance: " + _distance);
                         }
+                    }
 
-                        if (_interactable == null)
+                    // if (_interactable == null)
+                    // {
+                    //     TouchManager.instance.RegisterMultiTouchCapableTouchHandler(this);
+                    // }
+
+                    break;
+                case TouchPhase.Stationary:
+                    _touchTimer += Time.deltaTime;
+                    break;
+                case TouchPhase.Moved:
+                    _hasMoved = true;
+
+                    if (_interactable != null)
+                    {
+                        _actOn.DragAt(_interactable, touchPosition, _distance);
+                    }
+                    else
+                    {
+                        if (HasMultiTouchPartner)
                         {
-                            TouchManager.instance.RegisterMultiTouchCapableTouchHandler(this);
-                        }
-
-                        break;
-                    case TouchPhase.Stationary:
-                        _touchTimer += Time.deltaTime;
-                        break;
-                    case TouchPhase.Moved:
-                        _hasMoved = true;
-
-                        if (_interactable != null)
-                        {
-                            _actOn.DragAt(_interactable, touchPosition, _distance);
+                            // print("MultiTouchPartner");
                         }
                         else
                         {
-                            if (HasMultiTouchPartner)
-                            {
-                                // print("MultiTouchPartner");
-                            }
-                            else
-                            {
-                                float rotateX = -touchDeltaPosition.y * CameraRotateSpeed * Time.deltaTime;
-                                float rotateY = touchDeltaPosition.x * CameraRotateSpeed * Time.deltaTime;
+                            float rotateX = -touchDeltaPosition.y * CameraRotateSpeed * Time.deltaTime;
+                            float rotateY = touchDeltaPosition.x * CameraRotateSpeed * Time.deltaTime;
 
-                                Quaternion currentRotation = MainCamera.transform.rotation;
-                                Quaternion newRotation = Quaternion.Euler(
-                                    currentRotation.eulerAngles.x + rotateX,
-                                    currentRotation.eulerAngles.y + rotateY,
-                                    0f
-                                );
-                                MainCamera.transform.rotation = newRotation;
-                            }
+                            Quaternion currentRotation = MainCamera.transform.rotation;
+                            Quaternion newRotation = Quaternion.Euler(
+                                currentRotation.eulerAngles.x + rotateX,
+                                currentRotation.eulerAngles.y + rotateY,
+                                0f
+                            );
+                            MainCamera.transform.rotation = newRotation;
                         }
+                    }
 
-                        break;
-                    case TouchPhase.Ended:
-                        // print("ended " + touchId);
+                    break;
+                case TouchPhase.Ended:
+                    // print("ended " + touchId);
 
-                        _interactable?.DisableOutline();
-                        TouchManager.instance.DeregisterMultiTouchCapableTouchHandler(this);
-                        _multiTouchPartner?.RemoveMultiTouchPartner();
-                        RemoveMultiTouchPartner();
+                    _interactable?.DisableOutline();
+                    // TouchManager.instance.DeregisterMultiTouchCapableTouchHandler(this);
+                    _multiTouchPartner?.RemoveMultiTouchPartner();
+                    RemoveMultiTouchPartner();
 
-                        if (_touchTimer <= MaxTimeForTap && !_hasMoved)
-                        {
-                            print($"Tap at {touchPosition}");
-                            _actOn.TapAt(touchPosition);
-                        }
-                        else if (_hasMoved)
-                        {
-                            print($"Swipe at {touchPosition}");
-                        }
-                        else
-                        {
-                            print($"Hold at {touchPosition}");
-                        }
+                    if (_touchTimer <= MaxTimeForTap && !_hasMoved)
+                    {
+                        print($"Tap at {touchPosition}");
+                        _actOn.TapAt(touchPosition);
+                    }
+                    else if (_hasMoved)
+                    {
+                        print($"Swipe at {touchPosition}");
+                    }
+                    else
+                    {
+                        print($"Hold at {touchPosition}");
+                    }
 
-                        TouchManager.instance.RemoveTouchHandler(this);
+                    TouchHandler touchHandler = this;
 
-                        break;
-                }
+                    TouchManager.Instance.RemoveTouchHandler(touchHandler);
+
+                    break;
             }
-            catch (Exception e)
-            {
-                // print(e);
-            }   
         }
     }
 }
