@@ -59,7 +59,7 @@ namespace com.GamesForMobileDevices
             _hasMoved = false;
             _interactable = null;
         }
-
+    
         internal void SetMultiTouchPartner(TouchHandler touchHandler)
         {
             _multiTouchPartner = touchHandler;
@@ -92,10 +92,10 @@ namespace com.GamesForMobileDevices
                         }
                     }
 
-                    // if (_interactable == null)
-                    // {
-                    //     TouchManager.instance.RegisterMultiTouchCapableTouchHandler(this);
-                    // }
+                    if (_interactable == null)
+                    {
+                        TouchManager.Instance.RegisterMultiTouchCapableTouchHandler(this);
+                    }
 
                     break;
                 case TouchPhase.Stationary:
@@ -112,7 +112,7 @@ namespace com.GamesForMobileDevices
                     {
                         if (HasMultiTouchPartner)
                         {
-                            // print("MultiTouchPartner");
+                            print("MultiTouchPartner");
                         }
                         else
                         {
@@ -134,7 +134,7 @@ namespace com.GamesForMobileDevices
                     // print("ended " + touchId);
 
                     _interactable?.DisableOutline();
-                    // TouchManager.instance.DeregisterMultiTouchCapableTouchHandler(this);
+                    TouchManager.Instance.UnregisterMultiTouchCapableTouchHandler(this);
                     _multiTouchPartner?.RemoveMultiTouchPartner();
                     RemoveMultiTouchPartner();
 

@@ -102,5 +102,15 @@ namespace com.GamesForMobileDevices
                 }
             }
         }
+        
+        internal void RegisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
+        {
+            _multiTouchCapableTouchHandlers.Add(touchHandler);
+        }
+        
+        internal void UnregisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
+        {
+            _multiTouchCapableTouchHandlers.Remove(touchHandler);
+        }
     }
 }

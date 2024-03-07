@@ -24,7 +24,11 @@ namespace com.GamesForMobileDevices.Interactable
         }
 
         public abstract void ProcessTap();
-        public abstract void ProcessDrag(Vector3 newPosition);
+
+        public virtual void ProcessDrag(Vector3 newPosition)
+        {
+            Position = newPosition;
+        }
 
         public void EnableOutline()
         {

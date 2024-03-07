@@ -8,10 +8,5 @@ namespace com.GamesForMobileDevices.Interactable
         {
             GetComponent<Renderer>().material.color = Color.red;
         }
-
-        public override void ProcessDrag(Vector3 newPosition)
-        {
-            Position = newPosition;
-        }
     }
 }
