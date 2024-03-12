@@ -9,7 +9,11 @@ namespace com.GamesForMobileDevices.Interactable
 
         [SerializeField] private DragType dragType = DragType.Orbit;
 
-        public DragType DragType => dragType;
+        public DragType DragType
+        {
+            get => dragType;
+            set => dragType = value;
+        }
 
         public Vector3 Position
         {

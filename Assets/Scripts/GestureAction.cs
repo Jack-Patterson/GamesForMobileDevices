@@ -6,6 +6,8 @@ namespace com.GamesForMobileDevices
     public class GestureAction : MonoBehaviour
     {
         private Camera MainCamera => Camera.main;
+        [SerializeField] private LayerMask planeLayerMask;
+        [SerializeField] private LayerMask surfaceLayerMask;
 
         internal void TapAt(Vector2 touchPosition)
         {
@@ -24,13 +26,28 @@ namespace com.GamesForMobileDevices
         {
             Ray ray = MainCamera.ScreenPointToRay(touchPosition);
 
-            if (distance == 0 && Physics.Raycast(ray, out RaycastHit hit))
+            switch (interactable.DragType)
             {
-                interactable?.ProcessDrag(hit.point);
-            }
-            else
-            {
-                interactable?.ProcessDrag(ray.GetPoint(distance));
+                case DragType.Surface:
+                    print("in");
+                    if (Physics.Raycast(ray, out RaycastHit surfaceHit, Mathf.Infinity, surfaceLayerMask))
+                    {
+                        print("hit");
+                        Vector3 surfacePoint = surfaceHit.point;
+                        surfacePoint.y += 1f;
+                        interactable?.ProcessDrag(surfaceHit.point);
+                    }
+                    break;
+                case DragType.Plane:
+                    if (Physics.Raycast(ray, out RaycastHit planeHit, Mathf.Infinity, planeLayerMask))
+                    {
+                        interactable?.ProcessDrag(planeHit.point);
+                    }
+                    break;
+                case DragType.Orbit:
+                default:
+                    interactable?.ProcessDrag(ray.GetPoint(distance));
+                    break;
             }
         }
 
