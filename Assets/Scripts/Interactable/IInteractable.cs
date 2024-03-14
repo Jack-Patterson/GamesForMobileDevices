@@ -9,6 +9,7 @@ namespace com.GamesForMobileDevices.Interactable
         
         void ProcessTap();
         void ProcessDrag(Vector3 newPosition);
+        void ProcessScale(float scale);
         void EnableOutline();
         void DisableOutline();
     }

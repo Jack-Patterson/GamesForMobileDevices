@@ -172,7 +172,7 @@ MonoBehaviour:
     m_Bits: 8
   surfaceLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 72
 --- !u!1 &24164327
 GameObject:
   m_ObjectHideFlags: 0

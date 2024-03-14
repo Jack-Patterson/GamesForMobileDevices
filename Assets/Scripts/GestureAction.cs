@@ -29,10 +29,8 @@ namespace com.GamesForMobileDevices
             switch (interactable.DragType)
             {
                 case DragType.Surface:
-                    print("in");
                     if (Physics.Raycast(ray, out RaycastHit surfaceHit, Mathf.Infinity, surfaceLayerMask))
                     {
-                        print("hit");
                         Vector3 surfacePoint = surfaceHit.point;
                         surfacePoint.y += 1f;
                         interactable?.ProcessDrag(surfaceHit.point);

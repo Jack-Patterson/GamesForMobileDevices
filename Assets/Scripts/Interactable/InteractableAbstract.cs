@@ -33,6 +33,11 @@ namespace com.GamesForMobileDevices.Interactable
         {
             Position = newPosition;
         }
+        
+        public virtual void ProcessScale(float scale)
+        {
+            transform.localScale = new Vector3(scale, scale, scale);
+        }
 
         public void EnableOutline()
         {
