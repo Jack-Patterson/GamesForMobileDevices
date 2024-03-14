@@ -49,9 +49,14 @@ namespace com.GamesForMobileDevices
             }
         }
 
-        internal void DragAtRaycast(IInteractable interactable, Vector2 touchPosition)
+        public void ScaleAt(IInteractable interactable, float distance)
         {
-            Ray ray = MainCamera.ScreenPointToRay(touchPosition);
+            interactable.ProcessScale(distance);
+        }
+        
+        public void RotateAt(IInteractable interactable, float angle)
+        {
+            interactable.ProcessRotate(angle);
         }
     }
 }

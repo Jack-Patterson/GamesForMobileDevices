@@ -36,7 +36,12 @@ namespace com.GamesForMobileDevices.Interactable
         
         public virtual void ProcessScale(float scale)
         {
-            transform.localScale = new Vector3(scale, scale, scale);
+            transform.localScale *= scale;
+        }
+        
+        public virtual void ProcessRotate(float angle)
+        {
+            transform.rotation *= Quaternion.Euler(0, 0, angle);
         }
 
         public void EnableOutline()

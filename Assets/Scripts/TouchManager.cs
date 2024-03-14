@@ -65,6 +65,30 @@ namespace com.GamesForMobileDevices
             {
                 RemoveTouchHandler(endedTouchId);
             }
+            
+            CheckMultiTouch();
+        }
+
+        internal void CheckMultiTouch()
+        {
+            // Handle multi-touch capable touch handlers
+            if (_multiTouchCapableTouchHandlers.Count >= 2)
+            {
+                for (int i = 0; i < _multiTouchCapableTouchHandlers.Count; i += 2)
+                {
+                    if (i + 1 >= _multiTouchCapableTouchHandlers.Count) continue;
+                    TouchHandler touchHandler1 = _multiTouchCapableTouchHandlers[i];
+                    TouchHandler touchHandler2 = _multiTouchCapableTouchHandlers[i + 1];
+                    
+                    if (touchHandler1.HasMultiTouchPartner || touchHandler2.HasMultiTouchPartner) continue;
+                    touchHandler1.SetMultiTouchPartner(touchHandler2);
+                    touchHandler2.SetMultiTouchPartner(touchHandler1);
+
+                    touchHandler1.isMultiTouchController = true;
+                    touchHandler2.isMultiTouchController = false;
+                    touchHandler1.GetInitialMultiTouchData();
+                }
+            }
         }
         
         private void CreateTouchHandler(Touch touch)
