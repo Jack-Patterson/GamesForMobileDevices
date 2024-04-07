@@ -1,18 +1,20 @@
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace com.GamesForMobileDevices
 {
     public class TouchManager : MonoBehaviour
     {
         internal static TouchManager Instance = null!;
+        internal bool ShouldRotateCamera => _toggle.isOn;
         private GestureAction _actOn = null!;
         private readonly List<TouchHandler> _multiTouchCapableTouchHandlers = new();
-        private List<TouchHandler> touchHandlers = new List<TouchHandler>();
+        private readonly List<TouchHandler> touchHandlers = new List<TouchHandler>();
+        private Toggle _toggle;
 
         private void Awake()
         {
@@ -29,6 +31,7 @@ namespace com.GamesForMobileDevices
         private void Start()
         {
             _actOn = FindObjectOfType<GestureAction>();
+            _toggle = FindObjectOfType<Toggle>();
         }
 
         private void Update()

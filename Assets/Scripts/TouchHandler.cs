@@ -120,21 +120,45 @@ namespace com.GamesForMobileDevices
                     {
                         if (!isMultiTouchController) break;
 
+                        Vector2 otherTouchPosition = _multiTouchPartner.GetTouchPosition();
                         IInteractable interactable = _interactable ?? _multiTouchPartner._interactable;
-                        
+
                         if (interactable != null)
                         {
-                            Vector2 otherTouchPosition = _multiTouchPartner.GetTouchPosition();
-                            
                             float newDistance = Vector2.Distance(touchPosition, otherTouchPosition);
                             _actOn.ScaleAt(interactable, newDistance / _initialMultiTouchDistance);
                             _initialMultiTouchDistance = newDistance;
-                            
-                            float currentAngle = Mathf.Atan2(otherTouchPosition.y - touchPosition.y, 
-                                otherTouchPosition.x - touchPosition.x) * Mathf.Rad2Deg;
+
+                            float cameraPositionZ = MainCamera.transform.position.z;
+                            Vector3 fingerPositionWorld =
+                                MainCamera.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y,
+                                    cameraPositionZ));
+                            Vector3 otherFingerPositionWorld =
+                                MainCamera.ScreenToWorldPoint(new Vector3(otherTouchPosition.x, otherTouchPosition.y,
+                                    cameraPositionZ));
+                            float currentAngle = Mathf.Atan2(otherFingerPositionWorld.y - fingerPositionWorld.y,
+                                otherFingerPositionWorld.x - fingerPositionWorld.x) * Mathf.Rad2Deg;
                             float angleDifference = currentAngle - _initialMultiTouchAngle;
                             _actOn.RotateAt(interactable, angleDifference);
                             _initialMultiTouchAngle = currentAngle;
+                        }
+                        else
+                        {
+                            if (TouchManager.Instance.ShouldRotateCamera)
+                            {
+                                float currentAngle = Mathf.Atan2(otherTouchPosition.y - touchPosition.y,
+                                    otherTouchPosition.x - touchPosition.x) * Mathf.Rad2Deg;
+                                float angleDifference = currentAngle - _initialMultiTouchAngle;
+                                MainCamera.transform.rotation *= Quaternion.AngleAxis(angleDifference, Vector3.forward);
+                                _initialMultiTouchAngle = currentAngle;
+                                print(currentAngle);
+                            }
+                            // else
+                            // {
+                                float newDistance = Vector2.Distance(touchPosition, otherTouchPosition);
+                                MainCamera.fieldOfView += (newDistance - _initialMultiTouchDistance) * 0.1f * -1f;
+                                _initialMultiTouchDistance = newDistance;
+                            // }
                         }
                     }
                     else
@@ -198,10 +222,26 @@ namespace com.GamesForMobileDevices
         {
             Vector2 touchPosition = GetTouchPosition();
             Vector2 otherTouchPosition = _multiTouchPartner.GetTouchPosition();
-            
+
             _initialMultiTouchDistance = Vector2.Distance(touchPosition, otherTouchPosition);
-            _initialMultiTouchAngle = Mathf.Atan2(otherTouchPosition.y - touchPosition.y, 
-                otherTouchPosition.x - touchPosition.x) * Mathf.Rad2Deg;
+
+            float cameraPositionZ = MainCamera.transform.position.z;
+            Vector2 touchPos, otherTouchPos;
+            IInteractable interactable = _interactable ?? _multiTouchPartner._interactable;
+            if (interactable != null)
+            {
+                (touchPos, otherTouchPos) = (
+                    MainCamera.ScreenToWorldPoint(new Vector3(touchPosition.x, touchPosition.y, cameraPositionZ)),
+                    MainCamera.ScreenToWorldPoint(new Vector3(otherTouchPosition.x, otherTouchPosition.y,
+                        cameraPositionZ)));
+            }
+            else
+            {
+                (touchPos, otherTouchPos) = (touchPosition, otherTouchPosition);
+            }
+
+            _initialMultiTouchAngle =
+                Mathf.Atan2(otherTouchPos.y - touchPos.y, otherTouchPos.x - touchPos.x) * Mathf.Rad2Deg;
         }
     }
 }
