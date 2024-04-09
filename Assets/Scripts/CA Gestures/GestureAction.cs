@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace com.GamesForMobileDevices
 {
-    public class GestureAction : MonoBehaviour
+    public partial class GestureAction : MonoBehaviour
     {
         private Camera MainCamera => Camera.main;
         [SerializeField] private LayerMask planeLayerMask;

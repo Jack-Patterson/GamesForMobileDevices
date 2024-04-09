@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using com.GamesForMobileDevices.Interactable;
 using UnityEngine;
 
@@ -8,7 +7,7 @@ namespace com.GamesForMobileDevices
     public class TouchHandler : MonoBehaviour
     {
         private static Camera MainCamera => Camera.main;
-        internal int touchId = -1;
+        public int TouchId { get; set; } = -1;
         private const float MaxTimeForTap = 0.5f;
         private const float CameraRotateSpeed = 5f;
         private float _touchTimer;
@@ -16,50 +15,33 @@ namespace com.GamesForMobileDevices
         private GestureAction _actOn;
         private IInteractable _interactable;
         private float _distance;
-        internal int previousTouchId;
 
 
+        public TouchHandler MultiTouchPartner {get => _multiTouchPartner; set => _multiTouchPartner = value;}
         private TouchHandler _multiTouchPartner;
-        internal bool HasMultiTouchPartner => _multiTouchPartner != null;
-        internal bool isMultiTouchController = false;
+        public bool HasMultiTouchPartner => _multiTouchPartner != null;
+        public bool IsMultiTouchController { get; set; }
         private float _initialMultiTouchDistance = 0f;
         private float _initialMultiTouchAngle = 0f;
 
         private void Update()
         {
-            if (touchId != previousTouchId)
-            {
-                print("not same");
-            }
-
-            try
-            {
-                // if (touchId == 1)
-                //     print(Input.GetTouch(touchId).phase + $"{touchId}");
-                // print(Input.GetTouch(touchId).fingerId);
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
-
-            if (touchId == -1 || !Input.touches.Any(touch => touch.fingerId == touchId)) return;
+            if (TouchId == -1 || Input.touches.All(touch => touch.fingerId != TouchId)) return;
 
             CheckTouch();
         }
 
-        internal void Initialize(int touchIndex, GestureAction actOn)
+        public void Initialize(int touchIndex, GestureAction actOn)
         {
-            touchId = touchIndex;
-            previousTouchId = touchIndex;
+            TouchId = touchIndex;
             _actOn = actOn;
 
             CheckTouch();
         }
 
-        internal void Reset()
+        public void Reset()
         {
-            touchId = -1;
+            TouchId = -1;
             _touchTimer = 0;
             _hasMoved = false;
             _interactable = null;
@@ -73,12 +55,12 @@ namespace com.GamesForMobileDevices
         internal void RemoveMultiTouchPartner()
         {
             _multiTouchPartner = null;
-            isMultiTouchController = false;
+            IsMultiTouchController = false;
         }
 
-        private void CheckTouch()
+        public void CheckTouch()
         {
-            Touch touch = Input.touches.First(t => t.fingerId == touchId);
+            Touch touch = Input.touches.First(t => t.fingerId == TouchId);
 
             Vector2 touchPosition = touch.position;
             Vector2 touchDeltaPosition = touch.deltaPosition;
@@ -87,8 +69,8 @@ namespace com.GamesForMobileDevices
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-                    TouchManager.Instance.RegisterMultiTouchCapableTouchHandler(this);
-                    TouchManager.Instance.CheckMultiTouch();
+                    TouchManager.instance.RegisterMultiTouchCapableTouchHandler(this);
+                    TouchManager.instance.CheckMultiTouch();
 
                     if (HasMultiTouchPartner)
                     {
@@ -118,7 +100,7 @@ namespace com.GamesForMobileDevices
 
                     if (HasMultiTouchPartner)
                     {
-                        if (!isMultiTouchController) break;
+                        if (!IsMultiTouchController) break;
 
                         Vector2 otherTouchPosition = _multiTouchPartner.GetTouchPosition();
                         IInteractable interactable = _interactable ?? _multiTouchPartner._interactable;
@@ -144,7 +126,7 @@ namespace com.GamesForMobileDevices
                         }
                         else
                         {
-                            if (TouchManager.Instance.ShouldRotateCamera)
+                            if (TouchManager.instance.ShouldRotateCamera)
                             {
                                 float currentAngle = Mathf.Atan2(otherTouchPosition.y - touchPosition.y,
                                     otherTouchPosition.x - touchPosition.x) * Mathf.Rad2Deg;
@@ -153,12 +135,11 @@ namespace com.GamesForMobileDevices
                                 _initialMultiTouchAngle = currentAngle;
                                 print(currentAngle);
                             }
-                            // else
-                            // {
+                            
                                 float newDistance = Vector2.Distance(touchPosition, otherTouchPosition);
                                 MainCamera.fieldOfView += (newDistance - _initialMultiTouchDistance) * 0.1f * -1f;
                                 _initialMultiTouchDistance = newDistance;
-                            // }
+                            
                         }
                     }
                     else
@@ -176,7 +157,7 @@ namespace com.GamesForMobileDevices
                             Quaternion newRotation = Quaternion.Euler(
                                 currentRotation.eulerAngles.x + rotateX,
                                 currentRotation.eulerAngles.y + rotateY,
-                                0f
+                                currentRotation.eulerAngles.z
                             );
                             MainCamera.transform.rotation = newRotation;
                         }
@@ -187,7 +168,7 @@ namespace com.GamesForMobileDevices
                     // print("ended " + touchId);
 
                     _interactable?.DisableOutline();
-                    TouchManager.Instance.UnregisterMultiTouchCapableTouchHandler(this);
+                    TouchManager.instance.UnregisterMultiTouchCapableTouchHandler(this);
                     _multiTouchPartner?.RemoveMultiTouchPartner();
                     RemoveMultiTouchPartner();
 
@@ -207,7 +188,7 @@ namespace com.GamesForMobileDevices
 
                     TouchHandler touchHandler = this;
 
-                    TouchManager.Instance.RemoveTouchHandler(touchHandler);
+                    TouchManager.instance.RemoveTouchHandler(touchHandler);
 
                     break;
             }
@@ -215,10 +196,10 @@ namespace com.GamesForMobileDevices
 
         private Vector2 GetTouchPosition()
         {
-            return Input.touches.First(t => t.fingerId == touchId).position;
+            return Input.touches.First(t => t.fingerId == TouchId).position;
         }
 
-        internal void GetInitialMultiTouchData()
+        public void GetInitialMultiTouchData()
         {
             Vector2 touchPosition = GetTouchPosition();
             Vector2 otherTouchPosition = _multiTouchPartner.GetTouchPosition();

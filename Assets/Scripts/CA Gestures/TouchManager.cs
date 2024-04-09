@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,20 +7,20 @@ namespace com.GamesForMobileDevices
 {
     public class TouchManager : MonoBehaviour
     {
-        internal static TouchManager Instance = null!;
+        internal static TouchManager instance = null!;
         internal bool ShouldRotateCamera => _toggle.isOn;
         private GestureAction _actOn = null!;
         private readonly List<TouchHandler> _multiTouchCapableTouchHandlers = new();
-        private readonly List<TouchHandler> touchHandlers = new List<TouchHandler>();
+        private readonly List<TouchHandler> _touchHandlers = new();
         private Toggle _toggle;
 
         private void Awake()
         {
-            if (Instance == null)
+            if (instance == null)
             {
-                Instance = this;
+                instance = this;
             }
-            else if (Instance != this)
+            else if (instance != this)
             {
                 Destroy(gameObject);
             }
@@ -46,12 +44,14 @@ namespace com.GamesForMobileDevices
                 }
             }
 
-            touchHandlers.RemoveAll(handler => handler.touchId == -1 || !Input.touches.Any(t => t.fingerId == handler.touchId));
+            _touchHandlers.RemoveAll(handler =>
+                handler.TouchId == -1 || !Input.touches.Any(t => t.fingerId == handler.TouchId));
 
             // Reassign touchIds based on remaining touches
             foreach (Touch touch in Input.touches)
             {
-                TouchHandler existingHandler = touchHandlers.FirstOrDefault(handler => handler.touchId == touch.fingerId);
+                TouchHandler existingHandler =
+                    _touchHandlers.FirstOrDefault(handler => handler.TouchId == touch.fingerId)!;
                 if (existingHandler == null)
                 {
                     CreateTouchHandler(touch);
@@ -59,16 +59,16 @@ namespace com.GamesForMobileDevices
             }
 
             // Handle touch end outside of the loop to avoid modifying the collection during enumeration
-            List<int> endedTouches = touchHandlers
-                .Where(handler => !Input.touches.Any(t => t.fingerId == handler.touchId))
-                .Select(handler => handler.touchId)
+            List<int> endedTouches = _touchHandlers
+                .Where(handler => !Input.touches.Any(t => t.fingerId == handler.TouchId))
+                .Select(handler => handler.TouchId)
                 .ToList();
 
             foreach (int endedTouchId in endedTouches)
             {
                 RemoveTouchHandler(endedTouchId);
             }
-            
+
             CheckMultiTouch();
         }
 
@@ -82,37 +82,37 @@ namespace com.GamesForMobileDevices
                     if (i + 1 >= _multiTouchCapableTouchHandlers.Count) continue;
                     TouchHandler touchHandler1 = _multiTouchCapableTouchHandlers[i];
                     TouchHandler touchHandler2 = _multiTouchCapableTouchHandlers[i + 1];
-                    
+
                     if (touchHandler1.HasMultiTouchPartner || touchHandler2.HasMultiTouchPartner) continue;
                     touchHandler1.SetMultiTouchPartner(touchHandler2);
                     touchHandler2.SetMultiTouchPartner(touchHandler1);
 
-                    touchHandler1.isMultiTouchController = true;
-                    touchHandler2.isMultiTouchController = false;
+                    touchHandler1.IsMultiTouchController = true;
+                    touchHandler2.IsMultiTouchController = false;
                     touchHandler1.GetInitialMultiTouchData();
                 }
             }
         }
-        
+
         private void CreateTouchHandler(Touch touch)
         {
             GameObject touchHandlerParent = new GameObject($"TouchHandler {touch.fingerId}");
             touchHandlerParent.transform.SetParent(transform);
             TouchHandler newTouchHandler = touchHandlerParent.AddComponent<TouchHandler>();
             newTouchHandler.Initialize(touch.fingerId, _actOn);
-            touchHandlers.Add(newTouchHandler);
+            _touchHandlers.Add(newTouchHandler);
         }
 
         public void RemoveTouchHandler(TouchHandler touchHandler)
         {
-            touchHandlers.Remove(touchHandler);
+            _touchHandlers.Remove(touchHandler);
             // AdjustTouchHandlers(touchHandler.touchId);
             Destroy(touchHandler.gameObject);
         }
 
         private void RemoveTouchHandler(int touchId)
         {
-            TouchHandler handlerToRemove = touchHandlers.Find(handler => handler.touchId == touchId);
+            TouchHandler handlerToRemove = _touchHandlers.Find(handler => handler.TouchId == touchId);
             if (handlerToRemove != null)
             {
                 RemoveTouchHandler(handlerToRemove);
@@ -121,20 +121,20 @@ namespace com.GamesForMobileDevices
 
         private void AdjustTouchHandlers(int removedTouchId)
         {
-            foreach (TouchHandler handler in touchHandlers)
+            foreach (TouchHandler handler in _touchHandlers)
             {
-                if (handler.touchId > removedTouchId)
+                if (handler.TouchId > removedTouchId)
                 {
-                    handler.touchId--;
+                    handler.TouchId--;
                 }
             }
         }
-        
+
         internal void RegisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
         {
             _multiTouchCapableTouchHandlers.Add(touchHandler);
         }
-        
+
         internal void UnregisterMultiTouchCapableTouchHandler(TouchHandler touchHandler)
         {
             _multiTouchCapableTouchHandlers.Remove(touchHandler);
