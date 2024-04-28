@@ -1,28 +1,38 @@
 using UnityEngine;
 
-namespace com.GamesForMobileDevices.CA_Final.Ads
+namespace GamesForMobileDevices.CA_Final.Ads
 {
-    public class LevelPlayHandler : MonoBehaviour
+    public class LevelPlayHandler : MonoBehaviour, IAdHandler
     {
-        private void OnEnable()
-        {
-            IronSourceEvents.onSdkInitializationCompletedEvent += SdkInitializationCompletedEvent;
+        private static GameManager GameManager => GameManager.Instance;
 
-            IronSourceBannerEvents.onAdLoadedEvent += BannerOnAdLoadedEvent;
-            IronSourceBannerEvents.onAdLoadFailedEvent += BannerOnAdLoadFailedEvent;
-            IronSourceBannerEvents.onAdClickedEvent += BannerOnAdClickedEvent;
-            IronSourceBannerEvents.onAdScreenPresentedEvent += BannerOnAdScreenPresentedEvent;
-            IronSourceBannerEvents.onAdScreenDismissedEvent += BannerOnAdScreenDismissedEvent;
-            IronSourceBannerEvents.onAdLeftApplicationEvent += BannerOnAdLeftApplicationEvent;
+        public void Load()
+        {
+            IronSource.Agent.validateIntegration();
+            IronSource.Agent.init("1e45e7f1d");
+
             IronSourceInterstitialEvents.onAdReadyEvent += InterstitialOnAdReadyEvent;
             IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
         }
 
-        private void Start()
+        public void LoadAndShowBanner()
         {
-            IronSource.Agent.validateIntegration();
-            // IronSource.Agent.init("85460dcd");
-            IronSource.Agent.init("1e45e7f1d");
+            IronSource.Agent.loadBanner(IronSourceBannerSize.BANNER, IronSourceBannerPosition.BOTTOM);
+        }
+
+        public void DestroyBanner()
+        {
+            IronSource.Agent.destroyBanner();
+        }
+
+        public void LoadAndShowInterstitial()
+        {
+            IronSource.Agent.loadInterstitial();
+        }
+
+        public void LoadAndShowRewardedVideo()
+        {
+            IronSource.Agent.showRewardedVideo();
         }
 
         void OnApplicationPause(bool isPaused)
@@ -30,53 +40,14 @@ namespace com.GamesForMobileDevices.CA_Final.Ads
             IronSource.Agent.onApplicationPause(isPaused);
         }
 
-        private void SdkInitializationCompletedEvent()
-        {
-            IronSource.Agent.loadBanner(IronSourceBannerSize.BANNER, IronSourceBannerPosition.BOTTOM);
-            print("SDK Initialization completed - Start loading ads");
-        }
-        
         void InterstitialOnAdReadyEvent(IronSourceAdInfo adInfo)
         {
             IronSource.Agent.showInterstitial();
         }
-        
-        void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo){
-            GameManager.instance.AddCoins(20);
-        }
 
-        #region Banner
-
-        //Invoked once the banner has loaded
-        void BannerOnAdLoadedEvent(IronSourceAdInfo adInfo)
+        void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
         {
+            GameManager.AddCoins(20);
         }
-
-//Invoked when the banner loading process has failed.
-        void BannerOnAdLoadFailedEvent(IronSourceError ironSourceError)
-        {
-        }
-
-// Invoked when end user clicks on the banner ad
-        void BannerOnAdClickedEvent(IronSourceAdInfo adInfo)
-        {
-        }
-
-//Notifies the presentation of a full screen content following user click
-        void BannerOnAdScreenPresentedEvent(IronSourceAdInfo adInfo)
-        {
-        }
-
-//Notifies the presented screen has been dismissed
-        void BannerOnAdScreenDismissedEvent(IronSourceAdInfo adInfo)
-        {
-        }
-
-//Invoked when the user leaves the app
-        void BannerOnAdLeftApplicationEvent(IronSourceAdInfo adInfo)
-        {
-        }
-
-        #endregion
     }
 }
