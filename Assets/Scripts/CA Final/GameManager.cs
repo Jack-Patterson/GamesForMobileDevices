@@ -7,18 +7,19 @@ namespace GamesForMobileDevices.CA_Final
 {
     public class GameManager : MonoBehaviour
     {
-        public static GameManager Instance;
+        public static GameManager instance;
         public int CurrentLevel { get; private set; } = 1;
         public int Coins { get; private set; }
-        private bool areAdsEnabled = true;
+        private bool _areAdsEnabled = true;
+        private bool _useDefaultPlayerModel = true;
 
         public bool AreAdsEnabled
         {
-            get => areAdsEnabled;
+            get => _areAdsEnabled;
             set
             {
-                areAdsEnabled = value;
-                if (areAdsEnabled)
+                _areAdsEnabled = value;
+                if (_areAdsEnabled)
                 {
                     AdManager.Instance.LoadAndShowBanner();
                 }
@@ -28,19 +29,24 @@ namespace GamesForMobileDevices.CA_Final
                 }
             }
         }
+        public bool UseDefaultPlayerModel
+        {
+            get => _useDefaultPlayerModel;
+            set => _useDefaultPlayerModel = value;
+        }
 
-        public Action<int> OnLevelChanged;
-        public Action<int> OnCoinsChanged;
+        public Action<int> onLevelChanged;
+        public Action<int> onCoinsChanged;
 
         private void Awake()
         {
-            if (Instance != null)
+            if (instance != null)
             {
                 Destroy(gameObject);
                 return;
             }
 
-            Instance = this;
+            instance = this;
             DontDestroyOnLoad(gameObject);
         }
 
@@ -52,13 +58,13 @@ namespace GamesForMobileDevices.CA_Final
         public void IncreaseLevel()
         {
             CurrentLevel++;
-            OnLevelChanged?.Invoke(CurrentLevel);
+            onLevelChanged?.Invoke(CurrentLevel);
         }
 
         public void AddCoins(int amount)
         {
             Coins += amount;
-            OnCoinsChanged?.Invoke(Coins);
+            onCoinsChanged?.Invoke(Coins);
         }
 
         public void SwitchToScene(string sceneName)

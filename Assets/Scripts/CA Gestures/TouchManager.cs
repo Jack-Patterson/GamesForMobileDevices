@@ -3,16 +3,18 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace com.GamesForMobileDevices
+namespace GamesForMobileDevices.CA_Gestures
 {
     public class TouchManager : MonoBehaviour
     {
         internal static TouchManager instance = null!;
-        internal bool ShouldRotateCamera => _toggle.isOn;
+        internal bool ShouldRotateCamera => _shouldRotateCameraToggle.isOn;
+        internal bool ShouldUseAccelerometer => _shouldUseAccelerometerToggle.isOn;
         private GestureAction _actOn = null!;
         private readonly List<TouchHandler> _multiTouchCapableTouchHandlers = new();
         private readonly List<TouchHandler> _touchHandlers = new();
-        private Toggle _toggle;
+        private Toggle _shouldRotateCameraToggle;
+        private Toggle _shouldUseAccelerometerToggle;
 
         private void Awake()
         {
@@ -29,7 +31,9 @@ namespace com.GamesForMobileDevices
         private void Start()
         {
             _actOn = FindObjectOfType<GestureAction>();
-            _toggle = FindObjectOfType<Toggle>();
+            Toggle[] toggles = FindObjectsOfType<Toggle>();
+            _shouldRotateCameraToggle = toggles.First(toggle => toggle.name == "ShouldRotateCameraToggle");
+            _shouldUseAccelerometerToggle = toggles.First(toggle => toggle.name == "ShouldUseAccelerometerToggle");
         }
 
         private void Update()

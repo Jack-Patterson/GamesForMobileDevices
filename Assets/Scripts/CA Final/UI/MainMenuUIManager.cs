@@ -3,6 +3,7 @@ using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SocialPlatforms;
 using UnityEngine.UI;
 
@@ -14,6 +15,7 @@ namespace GamesForMobileDevices.CA_Final.UI
         [SerializeField] private Button achievementsButton;
         [SerializeField] private Button storeButton;
         [SerializeField] private Button watchAdButton;
+        [SerializeField] private Button twitterButton;
 
         [SerializeField] private TMP_Text levelText;
         [SerializeField] private TMP_Text coinsText;
@@ -38,13 +40,14 @@ namespace GamesForMobileDevices.CA_Final.UI
             achievementsButton.onClick.AddListener(() => GameManager.SwitchToScene("Achievements"));
             storeButton.onClick.AddListener(() => { GameManager.SwitchToScene("Store"); });
             watchAdButton.onClick.AddListener(() => AdManager.Instance.LoadAndShowRewardedVideo());
+            twitterButton.onClick.AddListener(ShareScoreTwitter);
         }
 
         protected override void SubscribeText()
         {
-            GameManager.OnLevelChanged += level => { levelText.text = $"Level: {level}"; };
+            GameManager.onLevelChanged += level => { levelText.text = $"Level: {level}"; };
 
-            GameManager.OnCoinsChanged += coins => { coinsText.text = $"Coins: {coins}"; };
+            GameManager.onCoinsChanged += coins => { coinsText.text = $"Coins: {coins}"; };
         }
 
         protected override void AssignInitialText()
@@ -94,6 +97,14 @@ namespace GamesForMobileDevices.CA_Final.UI
                     Debug.Log("Failed to submit score.");
                 }
             });
+        }
+        
+        private void ShareScoreTwitter()
+        {
+            string twitterMessage = $"I've got {GameManager.CurrentLevel} levels in this cool game!";
+            string url = $"https://twitter.com/intent/tweet?text={UnityWebRequest.EscapeURL(twitterMessage)}";
+            
+            Application.OpenURL(url);
         }
     }
 }

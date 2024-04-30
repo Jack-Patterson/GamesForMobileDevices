@@ -6,7 +6,7 @@ namespace GamesForMobileDevices.CA_Final.UI
 {
     public class UIManager : MonoBehaviour
     {
-        protected static GameManager GameManager => GameManager.Instance;
+        protected static GameManager GameManager => GameManager.instance;
 
         protected void Start()
         {

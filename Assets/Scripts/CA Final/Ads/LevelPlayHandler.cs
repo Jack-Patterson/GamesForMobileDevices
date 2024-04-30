@@ -4,7 +4,7 @@ namespace GamesForMobileDevices.CA_Final.Ads
 {
     public class LevelPlayHandler : MonoBehaviour, IAdHandler
     {
-        private static GameManager GameManager => GameManager.Instance;
+        private static GameManager GameManager => GameManager.instance;
 
         public void Load()
         {

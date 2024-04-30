@@ -11,7 +11,7 @@ namespace GamesForMobileDevices.CA_Final.Ads
         private const string InterstitialAdUnitId = "ca-app-pub-6128683645766691/8221214644";
         private const string RewardedAdUnitId = "ca-app-pub-6128683645766691/4289708493";
 
-        private static GameManager GameManager => GameManager.Instance;
+        private static GameManager GameManager => GameManager.instance;
         private BannerView bannerView;
         private InterstitialAd interstitialAd;
         private RewardedAd rewardedAd;

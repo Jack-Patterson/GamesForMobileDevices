@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace com.GamesForMobileDevices.Interactable
+namespace GamesForMobileDevices.CA_Gestures.Interactable
 {
     public class CapsuleScript : InteractableAbstract
     {

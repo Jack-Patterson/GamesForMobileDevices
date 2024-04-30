@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using GamesForMobileDevices.CA_Final.IAP;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Purchasing;
 using UnityEngine.UI;
 
 namespace GamesForMobileDevices.CA_Final.UI
@@ -31,7 +33,7 @@ namespace GamesForMobileDevices.CA_Final.UI
                 {
                     button.onClick.AddListener(() =>
                     {
-                        // Purchase logic
+                        InAppPurchasingManager.instance.Purchase(IAPItem.modelItem);
                     });
                 }
                 
@@ -39,7 +41,7 @@ namespace GamesForMobileDevices.CA_Final.UI
                 {
                     button.onClick.AddListener(() =>
                     {
-                        // Purchase logic
+                        InAppPurchasingManager.instance.Purchase(IAPItem.coinItem);
                     });
                 }
                 
@@ -47,8 +49,7 @@ namespace GamesForMobileDevices.CA_Final.UI
                 {
                     button.onClick.AddListener(() =>
                     {
-                        // Purchase logic
-                        GameManager.Instance.AreAdsEnabled = false;
+                        InAppPurchasingManager.instance.Purchase(IAPItem.disableAdsItem);
                     });
                 }
             });

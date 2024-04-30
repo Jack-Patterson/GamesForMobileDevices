@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace com.GamesForMobileDevices.Interactable
+namespace GamesForMobileDevices.CA_Gestures.Interactable
 {
     public abstract class InteractableAbstract : MonoBehaviour, IInteractable
     {

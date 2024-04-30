@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-using com.GamesForMobileDevices.Interactable;
+using GamesForMobileDevices.CA_Gestures.Interactable;
 using UnityEngine;
 
-namespace com.GamesForMobileDevices
+namespace GamesForMobileDevices.CA_Gestures
 {
     public class TouchHandler : MonoBehaviour
     {
@@ -17,7 +17,12 @@ namespace com.GamesForMobileDevices
         private float _distance;
 
 
-        public TouchHandler MultiTouchPartner {get => _multiTouchPartner; set => _multiTouchPartner = value;}
+        public TouchHandler MultiTouchPartner
+        {
+            get => _multiTouchPartner;
+            set => _multiTouchPartner = value;
+        }
+
         private TouchHandler _multiTouchPartner;
         public bool HasMultiTouchPartner => _multiTouchPartner != null;
         public bool IsMultiTouchController { get; set; }
@@ -135,11 +140,12 @@ namespace com.GamesForMobileDevices
                                 _initialMultiTouchAngle = currentAngle;
                                 print(currentAngle);
                             }
-                            
+                            else
+                            {
                                 float newDistance = Vector2.Distance(touchPosition, otherTouchPosition);
                                 MainCamera.fieldOfView += (newDistance - _initialMultiTouchDistance) * 0.1f * -1f;
                                 _initialMultiTouchDistance = newDistance;
-                            
+                            }
                         }
                     }
                     else

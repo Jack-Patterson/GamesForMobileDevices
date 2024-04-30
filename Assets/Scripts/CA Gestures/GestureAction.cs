@@ -1,9 +1,9 @@
-using com.GamesForMobileDevices.Interactable;
+using GamesForMobileDevices.CA_Gestures.Interactable;
 using UnityEngine;
 
-namespace com.GamesForMobileDevices
+namespace GamesForMobileDevices.CA_Gestures
 {
-    public partial class GestureAction : MonoBehaviour
+    public class GestureAction : MonoBehaviour
     {
         private Camera MainCamera => Camera.main;
         [SerializeField] private LayerMask planeLayerMask;

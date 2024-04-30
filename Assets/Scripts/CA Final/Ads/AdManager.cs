@@ -30,7 +30,7 @@ namespace GamesForMobileDevices.CA_Final.Ads
 
         public void LoadAndShowBanner()
         {
-            if (!GameManager.Instance.AreAdsEnabled)
+            if (!GameManager.instance.AreAdsEnabled)
                 return;
             
             if (ShouldUseAdMob())
@@ -47,7 +47,7 @@ namespace GamesForMobileDevices.CA_Final.Ads
 
         public void LoadAndShowInterstitial()
         {
-            if (!GameManager.Instance.AreAdsEnabled)
+            if (!GameManager.instance.AreAdsEnabled)
                 return;
             
             if (ShouldUseAdMob())
