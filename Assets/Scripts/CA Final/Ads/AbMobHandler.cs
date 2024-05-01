@@ -73,6 +73,7 @@ namespace GamesForMobileDevices.CA_Final.Ads
                     rewardedAd.Show((Reward reward) =>
                     {
                         GameManager.AddCoins((int)reward.Amount);
+                        PlayGamesHandler.instance.UnlockAchievement(GPGSIds.achievement_watch_a_rewarded_ad);
                     });
                 });
         }

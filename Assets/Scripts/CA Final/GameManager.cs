@@ -12,6 +12,13 @@ namespace GamesForMobileDevices.CA_Final
         public int Coins { get; private set; }
         private bool _areAdsEnabled = true;
         private bool _useDefaultPlayerModel = true;
+        
+        private bool _isGameOver = false;
+        public bool IsGameOver
+        {
+            get => _isGameOver;
+            set => _isGameOver = value;
+        }
 
         public bool AreAdsEnabled
         {
@@ -69,9 +76,9 @@ namespace GamesForMobileDevices.CA_Final
 
         public void SwitchToScene(string sceneName)
         {
-            AdManager.Instance.DestroyBanners();
+            AdManager.Instance?.DestroyBanners();
             SceneManager.LoadScene(sceneName);
-            AdManager.Instance.LoadAndShowBanner();
+            AdManager.Instance?.LoadAndShowBanner();
         }
     }
 }

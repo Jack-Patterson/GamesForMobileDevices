@@ -9,11 +9,11 @@ EditorBuildSettings:
     path: Assets/Scenes/CA2/MainMenu.unity
     guid: 4a6bb55153a2eda48ad1113cd60e94d4
   - enabled: 1
-    path: Assets/Scenes/CA2/CATemplateMenu.unity
-    guid: 9e71dd7d5f1e805459471305be26eb3c
-  - enabled: 1
     path: Assets/Scenes/CA2/Store.unity
     guid: 1a222bf5f00d57e48b413a8a34e5a93f
+  - enabled: 1
+    path: Assets/Scenes/CA2/Game.unity
+    guid: 9fec22b17cb93fc4dbc81d15c34adf30
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: f2d0c86e2b1b9644e8689a455ac0ce8f, type: 2}
     com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 838abc94b50a411448ebda46fb63ad1d, type: 2}

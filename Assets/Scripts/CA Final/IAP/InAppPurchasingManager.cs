@@ -100,6 +100,7 @@ namespace GamesForMobileDevices.CA_Final.IAP
                 GameManager.instance.AreAdsEnabled = false;
                 print("Ads disabled.");
             }
+            PlayGamesHandler.instance.UnlockAchievement(GPGSIds.achievement_buy_something_in_the_store);
 
             return PurchaseProcessingResult.Complete;
         }

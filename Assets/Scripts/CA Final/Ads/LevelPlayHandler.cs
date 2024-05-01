@@ -48,6 +48,7 @@ namespace GamesForMobileDevices.CA_Final.Ads
         void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
         {
             GameManager.AddCoins(20);
+            PlayGamesHandler.instance.UnlockAchievement(GPGSIds.achievement_watch_a_rewarded_ad);
         }
     }
 }

@@ -50,5 +50,19 @@ namespace GamesForMobileDevices.CA_Final
         {
             Social.ShowAchievementsUI();
         }
+        
+        public void SubmitScoreToLeaderboard(int score)
+        {
+            PlayGamesPlatform.Instance.ReportScore(score, GPGSIds.leaderboard_highest_level, (bool success) => {
+                if (success)
+                {
+                    Debug.Log("Score submitted successfully!");
+                }
+                else
+                {
+                    Debug.Log("Failed to submit score.");
+                }
+            });
+        }
     }
 }

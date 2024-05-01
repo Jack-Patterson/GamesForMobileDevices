@@ -25,7 +25,6 @@ namespace GamesForMobileDevices.CA_Final.UI
         {
             base.Start();
             AdManager.Instance.LoadAndShowBanner();
-            SubmitScoreToLeaderboard(100);
             LoadTopScores();
         }
 
@@ -35,9 +34,9 @@ namespace GamesForMobileDevices.CA_Final.UI
             {
                 PlayGamesHandler.instance.UnlockAchievement(GPGSIds.achievement_press_play);
                 AdManager.Instance.LoadAndShowInterstitial();
-                GameManager.SwitchToScene("CATemplateMenu");
+                GameManager.SwitchToScene("Game");
             });
-            achievementsButton.onClick.AddListener(() => GameManager.SwitchToScene("Achievements"));
+            achievementsButton.onClick.AddListener(() => PlayGamesHandler.instance.ShowAchievements());
             storeButton.onClick.AddListener(() => { GameManager.SwitchToScene("Store"); });
             watchAdButton.onClick.AddListener(() => AdManager.Instance.LoadAndShowRewardedVideo());
             twitterButton.onClick.AddListener(ShareScoreTwitter);
@@ -85,19 +84,7 @@ namespace GamesForMobileDevices.CA_Final.UI
             leaderboardText.text = formattedScores;
         }
         
-        public void SubmitScoreToLeaderboard(int score)
-        {
-            PlayGamesPlatform.Instance.ReportScore(score, GPGSIds.leaderboard_highest_level, (bool success) => {
-                if (success)
-                {
-                    Debug.Log("Score submitted successfully!");
-                }
-                else
-                {
-                    Debug.Log("Failed to submit score.");
-                }
-            });
-        }
+        
         
         private void ShareScoreTwitter()
         {
