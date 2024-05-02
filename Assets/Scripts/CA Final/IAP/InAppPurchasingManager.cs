@@ -1,4 +1,6 @@
-﻿using Unity.Services.Core;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Unity.Services.Core;
 using Unity.Services.Core.Environments;
 using UnityEngine;
 using UnityEngine.Purchasing;
@@ -9,10 +11,8 @@ namespace GamesForMobileDevices.CA_Final.IAP
     public class InAppPurchasingManager : MonoBehaviour, IDetailedStoreListener
     {
         public static InAppPurchasingManager instance;
-        
-        public IAPItem ModelItem { get; private set; }
-        public IAPItem CoinItem { get; private set; }
-        public IAPItem DisableAdsItem { get; private set; }
+
+        public List<ProductCatalogItem> products;
 
         private ConfigurationBuilder _builder;
         private IStoreController _storeController;
@@ -51,17 +51,18 @@ namespace GamesForMobileDevices.CA_Final.IAP
 
             foreach (ProductCatalogItem item in catalog.allProducts)
             {
-                print(item);
+                print(item.id + " " + item.type);
                 builder.AddProduct(item.id, item.type);
             }
+            products = catalog.allProducts.ToList();
             
             UnityPurchasing.Initialize(this, builder);
         }
 
-        public void Purchase(IAPItem item)
+        public void Purchase(ProductCatalogItem item)
         {
             print(_storeController);
-            _storeController.InitiatePurchase(item.ProductId);
+            _storeController.InitiatePurchase(item.id);
         }
 
         public void OnInitialized(IStoreController controller, IExtensionProvider extensions)

@@ -33,7 +33,7 @@ namespace GamesForMobileDevices.CA_Final.UI
                 {
                     button.onClick.AddListener(() =>
                     {
-                        InAppPurchasingManager.instance.Purchase(IAPItem.modelItem);
+                        InAppPurchasingManager.instance.Purchase(InAppPurchasingManager.instance.products.Find(product => product.id == "player_model_new"));
                     });
                 }
                 
@@ -41,7 +41,7 @@ namespace GamesForMobileDevices.CA_Final.UI
                 {
                     button.onClick.AddListener(() =>
                     {
-                        InAppPurchasingManager.instance.Purchase(IAPItem.coinItem);
+                        InAppPurchasingManager.instance.Purchase(InAppPurchasingManager.instance.products.Find(product => product.id == "10_coins"));
                     });
                 }
                 
@@ -49,7 +49,7 @@ namespace GamesForMobileDevices.CA_Final.UI
                 {
                     button.onClick.AddListener(() =>
                     {
-                        InAppPurchasingManager.instance.Purchase(IAPItem.disableAdsItem);
+                        InAppPurchasingManager.instance.Purchase(InAppPurchasingManager.instance.products.Find(product => product.id == "ads_disable"));
                     });
                 }
             });
